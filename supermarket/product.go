@@ -2,25 +2,24 @@ package supermarket
 
 import "math"
 
-// Product is
+// Product represents a product with a Price
 type Product struct {
 	Price float64
 	Name  string
 }
 
-// ProductSelection is
+// ProductSelection is the tupple Product and Quantity
 type ProductSelection struct {
 	Amt  int
 	Prod Product
 }
 
-// Basket is
+// Basket is a collection of ProductsSelection
 type Basket struct {
-	contents []ProductSelection
+	Contents []ProductSelection
 }
 
-// --- Price strategies ---
-
+// CalculatePrice allows to calculate the basket price using different strategies
 func CalculatePrice(b Basket, strategy func(Basket) float64) float64 {
 	return strategy(b)
 }
@@ -28,7 +27,7 @@ func CalculatePrice(b Basket, strategy func(Basket) float64) float64 {
 // NoDiscountStrategy No discount at all
 func NoDiscountStrategy(b Basket) float64 {
 	sum := 0.0
-	for _, item := range b.contents {
+	for _, item := range b.Contents {
 		sum += float64(item.Amt) * item.Prod.Price
 	}
 	return sum
@@ -37,11 +36,11 @@ func NoDiscountStrategy(b Basket) float64 {
 // OneFreeDiscountStrategy reduce one item per type in the basket
 func OneFreeDiscountStrategy(b Basket) float64 {
 	var newContents = make([]ProductSelection, 0)
-	for _, item := range b.contents {
+	for _, item := range b.Contents {
 		amt := int(math.Max(1, float64(item.Amt-1)))
 		item.Amt = amt
 		newContents = append(newContents, item)
 	}
-	newB := Basket{contents: newContents}
+	newB := Basket{Contents: newContents}
 	return NoDiscountStrategy(newB)
 }
